@@ -12,8 +12,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script>
   // ====== FILL THESE IN FROM YOUR SUPABASE PROJECT (Settings → API) ======
-  const SUPABASE_URL = "https://gkrvkerugvsifpzwomje.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_-xdiS5lazxRbneqotTYwJg_pG5uN2sY";
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
   // =========================================================================
   tailwind.config = {
     theme: { extend: {
@@ -104,8 +104,11 @@ const NAV = [
   {id:'analytics', label:'Analytics', icon:'📈'},
   {id:'risk', label:'Risk Calculator', icon:'🧮'},
   {id:'mistakes', label:'Mistakes / Leaks', icon:'🚩'},
+  {id:'copytrading', label:'Copy Trading', icon:'🔗'},
   {id:'settings', label:'Settings', icon:'⚙️'},
 ];
+const HFM_COPY_LINK = 'https://my.hfm.com/en/copy-trading/provider-details.html?provider=147056327';
+const HFM_REFERRAL_LINK = 'https://www.hfm.com/ke/?refid=30468552';
 const MISTAKE_OPTIONS = ['Oversizing','FOMO','Revenge trading','Overtrading','No confirmation','Before liquidity sweep','Against HTF bias','Poor RR','Moved SL','Early exit','Chased price','Outside session','Outside plan','Low-quality setup','Emotional trade','News trade'];
 const MOODS_BEFORE = ['Calm','Confident','Focused','Hesitant','Fearful','FOMO','Greedy','Revenge','Bored','Overconfident','Tired','Distracted'];
 const MOODS_AFTER = ['Calm','Satisfied','Frustrated','Angry','Regret','Fear','Excited','Overconfident','Disappointed'];
@@ -157,6 +160,7 @@ function setView(id){
   else if(id==='analytics') v.innerHTML = renderAnalytics();
   else if(id==='risk') { v.innerHTML = renderRiskCalc(); wireRiskCalc(); }
   else if(id==='mistakes') v.innerHTML = renderMistakes();
+  else if(id==='copytrading') v.innerHTML = renderCopyTrading();
   else if(id==='settings') { v.innerHTML = renderSettings(); }
   if(id==='dashboard') setTimeout(drawEquityChart,0);
 }
@@ -225,7 +229,14 @@ function renderDashboard(){
       </div>
     </div>
   </div>
-  <div class="text-xs text-muted">${s.count} closed trades analyzed. Statistics require more trades to become statistically meaningful — treat early figures as directional only.</div>
+  <div class="text-xs text-muted mb-4">${s.count} closed trades analyzed. Statistics require more trades to become statistically meaningful — treat early figures as directional only.</div>
+  <div class="card p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+    <div class="text-sm">Want to copy these trades automatically? Minimum deposit $100.</div>
+    <div class="flex gap-2">
+      <a href="${HFM_COPY_LINK}" target="_blank" rel="noopener" class="btn text-xs">Copy My Trades</a>
+      <button class="btn-ghost text-xs" onclick="setView('copytrading')">Details</button>
+    </div>
+  </div>
   `;
 }
 function metric(label,val,positive){
@@ -389,6 +400,18 @@ function renderMistakes(){
   <div class="card p-5">
     <table class="w-full text-sm"><thead><tr class="text-xs text-muted"><th class="text-left pb-2">Mistake</th><th>Occurrences</th><th>R impact</th><th>P&L impact</th></tr></thead>
     <tbody>${rows.length? rows.map(([k,v])=>`<tr class="border-t border-border"><td class="py-2">${k}</td><td class="text-center num">${v.n}</td><td class="text-center num text-loss">${fmt(v.r,1)}R</td><td class="text-center num text-loss">$${fmt(v.pnl,0)}</td></tr>`).join('') : `<tr><td class="py-3 text-muted text-xs" colspan="4">No leaks logged yet — great, or you haven't tagged mistakes on trades.</td></tr>`}</tbody></table>
+  </div>`;
+}
+
+// ---------- COPY TRADING ----------
+function renderCopyTrading(){
+  return `<div class="text-lg font-semibold mb-4">Copy Trading</div>
+  <div class="card p-6 max-w-lg space-y-4">
+    <p class="text-sm text-muted">Let HFM automatically mirror my trades into your own account, proportional to your balance. Minimum deposit to start copying is <span class="text-white num">$100</span>.</p>
+    <a href="${HFM_COPY_LINK}" target="_blank" rel="noopener" class="btn w-full text-center block">Copy My Trades on HFM</a>
+    <div class="text-xs text-muted pt-2 border-t border-border">Don't have an HFM account yet? Open one first, then come back and hit "Copy My Trades" above.</div>
+    <a href="${HFM_REFERRAL_LINK}" target="_blank" rel="noopener" class="btn-ghost w-full text-center block">Open an HFM Account</a>
+    <div class="text-xs text-muted pt-3 border-t border-border">These are referral/affiliate links — I may earn a commission if you sign up through them, at no extra cost to you. Copy trading carries risk, including the risk of loss; past performance shown in this journal does not guarantee future results.</div>
   </div>`;
 }
 
